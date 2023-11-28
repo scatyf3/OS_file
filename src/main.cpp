@@ -31,7 +31,7 @@ int main(){
 	do{
 		printf("> ");
 		fflush(stdin);
-		gets(str);
+		fgets(str, sizeof(str), stdin);
 	}while(shell(user_id,str));
 	logout(2118);
 	halt();
