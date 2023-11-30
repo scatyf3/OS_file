@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.12)
 project(filsys)
 
+set(CMAKE_C_COMPILER "/usr/bin/clang")
+set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+
 # 添加可执行文件
 add_executable(filsys
     ../src/main.cpp
