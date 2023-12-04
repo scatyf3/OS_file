@@ -14,16 +14,18 @@ int creat(unsigned int user_id, char *filename, unsigned short mode){
 		inode = iget(dir.direct[dirid].d_ino);
 		if(!(inode->di_mode&DIFILE)){//如果不是文件
 			printf("存在同名目录！\n");
+
 		}
 		if (access(user_id,inode,WRITE) == 0){
 			iput(inode);
 			printf("\n creat access not allowed \n");
 			return -1;
 		}
+		//初始化inode
 		j = inode->di_size%512?1:0;
 		for (i=0; i<inode->di_size/BLOCKSIZ+j; i++)
 			bfree(inode->di_addr[i]);
-
+		//
 		for (i=0; i<SYSOPENFILE; i++){
 			if (sys_ofile[i].f_count != 0 && sys_ofile[i].f_inode == inode){
 				sys_ofile[i].f_off = 0;

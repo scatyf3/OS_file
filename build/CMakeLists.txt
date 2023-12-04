@@ -25,6 +25,14 @@ add_executable(filsys
     ../src/shell.cpp
 )
 
+
+# 设置编译选项
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")  # 添加 -g 选项以生成调试信息
+
+# 链接选项
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -g")  # 添加 -g 选项以保留调试符号
+
+
 # 添加头文件搜索路径（如果有需要的话）
 # include_directories(include)
 

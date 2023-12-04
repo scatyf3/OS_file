@@ -65,7 +65,7 @@
 //Includes
 #include <stdio.h>
 #include <string.h>
-#include <sys/malloc.h>
+#include <malloc.h>
 #include <stdlib.h>
 
 /* error */

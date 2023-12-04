@@ -38,7 +38,7 @@ int shell(int user_id,char *str){
 	case 2:
 		token = strtok(NULL,seps);
 		if(token == NULL){
-			printf("mkdirÃüÁîµÄÕıÈ·¸ñÊ½Îªmkdir dirname£¬Çë¼ì²éÃüÁî!\n");
+			printf("mkdirï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È·ï¿½ï¿½Ê½Îªmkdir dirnameï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½!\n");
 			break;
 		}
 		mkdir(token);
@@ -46,7 +46,7 @@ int shell(int user_id,char *str){
 	case 3:
 		token = strtok(NULL,seps);
 		if(token == NULL){
-			printf("cdÃüÁîµÄÕıÈ·¸ñÊ½Îªcd dirname£¬Çë¼ì²éÃüÁî!\n");
+			printf("cdï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È·ï¿½ï¿½Ê½Îªcd dirnameï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½!\n");
 			break;
 		}
 		chdir(token);
@@ -54,7 +54,7 @@ int shell(int user_id,char *str){
 	case 4:
 		token = strtok(NULL,seps);
 		if(token == NULL){
-			printf("mkfile ÃüÁîµÄÕıÈ·¸ñÊ½Îªmkfile filename [mode]£¬Çë¼ì²éÃüÁî!\n");
+			printf("mkfile ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È·ï¿½ï¿½Ê½Îªmkfile filename [mode]ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½!\n");
 			break;
 		}
 		tstr =token;
@@ -66,7 +66,7 @@ int shell(int user_id,char *str){
 		mode = mode|DIFILE|0700;
 		fd = creat(user_id,tstr,mode);
 		if(fd == -1){
-			printf("´´½¨ÎÄ¼şÊ§°Ü£¡\n");
+			printf("ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½Ê§ï¿½Ü£ï¿½\n");
 			break;
 		}
 		close(user_id,fd);
@@ -74,7 +74,7 @@ int shell(int user_id,char *str){
 	case 5:
 		token = strtok(NULL,seps);
 		if(token == NULL){
-			printf("del ÃüÁîµÄÕıÈ·¸ñÊ½Îªdel filename£¬Çë¼ì²éÃüÁî!\n");
+			printf("del ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È·ï¿½ï¿½Ê½Îªdel filenameï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½!\n");
 			break;
 		}
 		delete(token);
@@ -85,7 +85,7 @@ int shell(int user_id,char *str){
 		tstr = token;
 		token = strtok(NULL,seps);
 		if(token == NULL){
-			printf("write ÃüÁîµÄÕıÈ·¸ñÊ½Îªwrite filename bytes£¬Çë¼ì²éÃüÁî!\n");
+			printf("write ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È·ï¿½ï¿½Ê½Îªwrite filename bytesï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½!\n");
 			break;
 		}
 		if(token[0] == '-'){
@@ -106,7 +106,7 @@ int shell(int user_id,char *str){
 		tstr = token;
 		token = strtok(NULL,seps);
 		if(token == NULL){
-			printf("read ÃüÁîµÄÕıÈ·¸ñÊ½Îªread filename bytes£¬Çë¼ì²éÃüÁî!\n");
+			printf("read ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È·ï¿½ï¿½Ê½Îªread filename bytesï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½!\n");
 			break;
 		}
 		sscanf(token,"%d",&size);
@@ -120,7 +120,7 @@ int shell(int user_id,char *str){
 	case 0:
 		return 0;
 	default:
-		printf("´íÎó:Ã»ÓĞÃüÁî%s£¡\n",token);
+		printf("ï¿½ï¿½ï¿½ï¿½:Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½%sï¿½ï¿½\n",token);
 		break;
 	}
 	return 1;

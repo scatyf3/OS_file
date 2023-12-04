@@ -34,3 +34,8 @@
 #cmake
 build/*
 !CMakeLists.txt
+
+#IDE
+.vscode/
+.idea/
+.vs/
