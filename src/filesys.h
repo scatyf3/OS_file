@@ -1,44 +1,44 @@
 #ifndef _FILESYS_H
-#define _FILESYS_H 
+#define _FILESYS_H
 
-#define delete 		dele     		//delete ��c++���Ǳ�����  by tangfl
-//#define exit(a)		return			//����ʹ�� return         by tangfl 
+#define delete 		dele     		//delete 在c++里是保留字  by tangfl
+//#define exit(a)		return			//建议使用 return         by tangfl
 
 //All Defines
-#define BLOCKSIZ        512			//ÿ����Ĵ�С
+#define BLOCKSIZ        512			//每个块的大小
 #define SYSOPENFILE     40
-#define DIRNUM          128			//һ��Ŀ¼�� ��� ��Ŀ¼��
-#define DIRSIZ          12			//Ŀ¼������ windows32��int����Ϊ4 xiao 14->12
-#define PWDSIZ 			12			//������󳤶�
+#define DIRNUM          128			//一个目录下 最多 子目录数
+#define DIRSIZ          12			//目录名长度 windows32下int长度为4 xiao 14->12
+#define PWDSIZ 			12			//密码最大长度
 #define PWDNUM 			32
-#define NOFILE   		20			//�û������ļ���
-#define NADDR  			10			//i�ڵ��ڴ洢
-#define NHINO 			128			//hash��  ?????????/* must be power of 2 */
+#define NOFILE   		20			//用户最多打开文件数
+#define NADDR  			10			//i节点内存储
+#define NHINO 			128			//hash数  ?????????/* must be power of 2 */
 #define USERNUM 		10
-#define DINODESIZ 		52			//?????? int=4 �ʶ���2*NADRR ��Դ������Ϊlong������short Ӧ��Ϊ50�ֽڣ��˴�����ϵͳΪ�˶����ڴ棬����˵���xiao 32->52
+#define DINODESIZ 		52			//?????? int=4 故多了2*NADRR 但源代码中为long，该做short 应该为50字节，此处可能系统为了对齐内存，故如此调整xiao 32->52
 
 
 /*filesys*/
-#define DINODEBLK  		32							//i�ڵ�ռ�õĿ���
-#define FILEBLK   		512							//���ݿ���
-#define NICFREE  		50							//�������ڿ��п��ջ��С
-#define NICINOD  		50							//�������ڿ���i�ڵ������С
-#define DINODESTART  	(2*BLOCKSIZ)				//i�ڵ㿪ʼ��ַ �ճ�1024����һ��Ϊ���������ڶ���Ϊ������
-#define DATASTART  		((2+DINODEBLK)*BLOCKSIZ)	//��������ʼ��ַ DINODESTART+DINODEBLK*BLOCKSIZ	/*d:17408    0x4400*/
+#define DINODEBLK  		32							//i节点占用的块数
+#define FILEBLK   		512							//数据块数
+#define NICFREE  		50							//超级块内空闲块堆栈大小
+#define NICINOD  		50							//超级块内空闲i节点数组大小
+#define DINODESTART  	(2*BLOCKSIZ)				//i节点开始地址 空出1024，第一个为引导区，第二块为超级块
+#define DATASTART  		((2+DINODEBLK)*BLOCKSIZ)	//数据区开始地址 DINODESTART+DINODEBLK*BLOCKSIZ	/*d:17408    0x4400*/
 
 
 /*di_mode*/
-#define DIEMPTY   		00000						//��Ȩ��
-#define DIFILE      	01000						//���� �ļ�
-#define DIDIR     		02000						//���� Ŀ¼
+#define DIEMPTY   		00000						//空权限
+#define DIFILE      	01000						//类型 文件
+#define DIDIR     		02000						//类型 目录
 
-#define UDIREAD 		00001						//�û�Ȩ��
+#define UDIREAD 		00001						//用户权限
 #define UDIWRITE  		00002
 #define UDIEXICUTE  	00004
-#define GDIREAD   		00010						//�û���Ȩ��
+#define GDIREAD   		00010						//用户组权限
 #define GDIWRITE  		00020
 #define GDIEXICUTE  	00040
-#define ODIREAD  		00100						//pubilcȨ��
+#define ODIREAD  		00100						//pubilc权限
 #define ODIWRITE 		00200
 #define ODIEXICUTE 		00400
 
@@ -48,14 +48,14 @@
 #define EXICUTE 		3
 
 
-#define DEFAULTMODE 	00777					//Ĭ��Ȩ��
+#define DEFAULTMODE 	00777					//默认权限
 
 
 /* i_flag */
 #define  IUPDATE  		00002
 
 /* s_fmod */
-#define SUPDATE  		00001 
+#define SUPDATE  		00001
 
 /* f_flag */
 #define FREAD   		00001
@@ -65,7 +65,7 @@
 //Includes
 #include <stdio.h>
 #include <string.h>
-#include <malloc.h>
+#include <sys/malloc.h>
 #include <stdlib.h>
 
 /* error */
@@ -76,83 +76,83 @@
 
 
 struct inode{
-	struct inode  	*i_forw;
-	struct inode  	*i_back;
-	char 			i_flag;
-	unsigned int  	i_ino;          /*����i �ڵ��־*/
-	unsigned int  	i_count;     	/*���ü���*/
-	unsigned short  di_number; 		/*�����ļ�������Ϊ0 ʱ����ɾ�����ļ�*/
-	unsigned short  di_mode;  		/*��ȡȨ��*/
-	unsigned short  di_uid;
-	unsigned short  di_gid;
-	unsigned short  di_size;   		/*�ļ���С*/
-	unsigned int   	di_addr[NADDR];   /*�������*/
+    struct inode  	*i_forw;
+    struct inode  	*i_back;
+    char 			i_flag;
+    unsigned int  	i_ino;          /*磁盘i 节点标志*/
+    unsigned int  	i_count;     	/*引用计数*/
+    unsigned short  di_number; 		/*关联文件数。当为0 时，则删除该文件*/
+    unsigned short  di_mode;  		/*存取权限*/
+    unsigned short  di_uid;
+    unsigned short  di_gid;
+    unsigned short  di_size;   		/*文件大小*/
+    unsigned int   	di_addr[NADDR];   /*物理块号*/
 };
 
 struct dinode{
-	unsigned short 	di_number; 		/*�����ļ���*/
-	unsigned short 	di_mode; 		/*��ȡȨ��*/
-	unsigned short 	di_uid;
-	unsigned short 	di_gid;
-	unsigned short 	di_size;  		/*�ļ���С*/
-	unsigned int 	di_addr[NADDR];   /*�������*/
+    unsigned short 	di_number; 		/*关联文件数*/
+    unsigned short 	di_mode; 		/*存取权限*/
+    unsigned short 	di_uid;
+    unsigned short 	di_gid;
+    unsigned short 	di_size;  		/*文件大小*/
+    unsigned int 	di_addr[NADDR];   /*物理块号*/
 };
 
 
 struct direct{
-	char d_name[DIRSIZ];
-	unsigned int d_ino;
+    char d_name[DIRSIZ];
+    unsigned int d_ino;
 };
 
 struct filsys{
-	unsigned short  	s_isize;   			/*i�ڵ�����*/
-	unsigned long   	s_fsize;   			/*���ݿ����*/
-	unsigned int   		s_nfree;    		/*���п�*/
-	unsigned short  	s_pfree;  			/*���п�ָ��*/ 
-	unsigned int  		s_free[NICFREE];  	/*���п��ջ*/
-	
-	unsigned int  		s_ninode;  			/*number of free inode in s_inode*/
-	short int 			s_pinode;  			/*pointer of the sinode*/
-	unsigned int  		s_inode[NICINOD];   /*����i�ڵ�����*/
-	unsigned int 		s_rinode;    		/*remember inode*/
+    unsigned short  	s_isize;   			/*i节点块块数*/
+    unsigned long   	s_fsize;   			/*数据块块数*/
+    unsigned int   		s_nfree;    		/*空闲块*/
+    unsigned short  	s_pfree;  			/*空闲块指针*/
+    unsigned int  		s_free[NICFREE];  	/*空闲块堆栈*/
 
-	char 				s_fmod;  			/*�������޸ı�־*/
-	};
+    unsigned int  		s_ninode;  			/*number of free inode in s_inode*/
+    short int 			s_pinode;  			/*pointer of the sinode*/
+    unsigned int  		s_inode[NICINOD];   /*空闲i节点数组*/
+    unsigned int 		s_rinode;    		/*remember inode*/
+
+    char 				s_fmod;  			/*超级块修改标志*/
+};
 
 struct pwd{
-	unsigned short 		p_uid;
-	unsigned short 		p_gid;
-	char 				password [PWDSIZ];
+    unsigned short 		p_uid;
+    unsigned short 		p_gid;
+    char 				password [PWDSIZ];
 };
 
 struct dir{
-	struct direct 		direct[DIRNUM];
-	int 				size;  				/*��ǰĿ¼��С*/
+    struct direct 		direct[DIRNUM];
+    int 				size;  				/*当前目录大小*/
 };
 
 struct hinode{
-	struct inode 		*i_forw;   /*HASG��ָ��*/
+    struct inode 		*i_forw;   /*HASG表指针*/
 };
 
 struct file{
-	char 			f_flag;    		/*�ļ�������־*/
-	unsigned int 	f_count;  		/*���ü���*/
-	struct inode 	*f_inode; 		/*ָ���ڴ�i�ڵ�*/
-	unsigned long 	f_off;   		/*read/write character pointer*/ 
+    char 			f_flag;    		/*文件操作标志*/
+    unsigned int 	f_count;  		/*引用计数*/
+    struct inode 	*f_inode; 		/*指向内存i节点*/
+    unsigned long 	f_off;   		/*read/write character pointer*/
 };
 
 struct user{
-	unsigned short 	u_default_mode;
-	unsigned short 	u_uid;
-	unsigned short 	u_gid;
-	unsigned short 	u_ofile[NOFILE];   /*�û����ļ���*/
+    unsigned short 	u_default_mode;
+    unsigned short 	u_uid;
+    unsigned short 	u_gid;
+    unsigned short 	u_ofile[NOFILE];   /*用户打开文件表*/
 };
-	
+
 //all variables
 extern struct hinode   hinode[NHINO];
-extern struct dir      dir;           /*��ǰĿ¼(���ڴ���ȫ������)*/
+extern struct dir      dir;           /*当前目录(在内存中全部读入)*/
 extern struct file     sys_ofile[SYSOPENFILE];
-extern struct filsys   filsys;        /*�ڴ��еĳ�����*/
+extern struct filsys   filsys;        /*内存中的超级块*/
 extern struct pwd      pwd[PWDNUM];
 extern struct user     user[USERNUM];
 //extern struct file     *fd;           /*the file system column of all the system*/    //xiao

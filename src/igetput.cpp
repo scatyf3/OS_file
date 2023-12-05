@@ -72,7 +72,7 @@ void iput(struct inode *pinode)
 	unsigned int block_num;
 	int i;
 
-	if ((pinode->i_count > 1) && (pinode->di_mode&DIFILE))//若引用计数>1，以及是文件而非目录
+	if ((pinode->i_count > 1))//若引用计数>1，以及是文件而非目录
 	{
 		pinode->i_count --;
 
