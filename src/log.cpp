@@ -67,8 +67,27 @@ void chpwd(char* new_pwd){
         }
     }
     return;
-
 }
+
+void userinfo(){
+    printf("User Info:\n");
+    printf("Default Mode: %hu\n", user[user_id].u_default_mode);
+    printf("User ID: %hu\n", user[user_id].u_uid);
+    printf("Group ID: %hu\n", user[user_id].u_gid);
+    printf("Open Files: ");
+    for (int i = 0; i < NOFILE; i++) {
+        printf("%hu ", user[user_id].u_ofile[i]);
+    }
+    printf("\n");
+    unsigned short u_uid = user[user_id].u_uid;
+    for(int i = 0;i<PWDNUM;i++){
+        if(pwd[i].p_uid == u_uid){
+            printf("Password: %s\n",pwd[i].password);
+        }
+    }
+}
+
+
 
 
 

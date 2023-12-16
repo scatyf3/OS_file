@@ -11,7 +11,8 @@ char commands[CNUM][CLEN]={
         "del",
         "write",
         "read",
-        "password"
+        "password",
+        "who"
 };
 int getcid(char *command){
     int i;
@@ -122,6 +123,9 @@ int shell(int user_id,char *str){
         case 8:
             token = strtok(NULL,seps);
             chpwd(token);
+            break;
+        case 9:
+            userinfo();
             break;
         case 0:
             halt();
