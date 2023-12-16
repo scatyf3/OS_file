@@ -27,6 +27,7 @@ int login(unsigned short uid, char *passwd){
 		printf("\nincorrect password\n");
 		return -1;
 	}else{
+        //printf("您的user_id是%d",j);
 		return j;
 	}
 }
@@ -58,6 +59,16 @@ int logout(unsigned short uid){
 	return 1;
 }
 
+void chpwd(char* new_pwd){
+    unsigned short 	u_uid = user[user_id].u_uid;
+    for(int i = 0;i<PWDNUM;i++){
+        if(pwd[i].p_uid == u_uid){
+            strcpy(pwd[i].password,new_pwd);
+        }
+    }
+    return;
+
+}
 
 
 
