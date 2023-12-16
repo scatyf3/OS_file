@@ -4,15 +4,12 @@
 
 #include <string.h>
 
-#define DIRSIZ 256
-#define DIEMPTY 0
-
-
 void _dir(){
 	unsigned int di_mode;
 	int i,j,k;          //xiao   
 	struct inode *temp_inode;
-	printf("当前共有%d个文件/目录\n",dir.size);
+    printf("当前共有%d个文件/目录\n",dir.size);
+    printf("\n CURRENT DIRECTORY :%s\n",dir.direct[0].d_name);
 	for (i=0; i<DIRNUM; i++){
 		if (dir.direct[i].d_ino != DIEMPTY){
             //打印文件名
