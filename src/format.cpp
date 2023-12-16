@@ -36,19 +36,20 @@ void format(){
 	/* 1.creat the main directory and its sub dir etc and the file password */
 
 	inode = iget(0);   /* 0 empty dinode id*/
-	inode->di_number = 1;			//??空i节点有何用????
+	inode->di_number = 1;			//??空i节点有何用????->我不到啊
 	inode->di_mode = DIEMPTY;
 	iput(inode);
 
+    //inode1里储存的是root目录，但是struct dir呢?
 	inode = iget(1);   /* 1 main dir id*/
 	inode->di_number = 1;
 	inode->di_mode = DEFAULTMODE | DIDIR;
 	inode->di_size = 3*(DIRSIZ + 4);
 	inode->di_addr[0] = 0; /*block 0# is used by the main directory*/
 	
-	strcpy(dir_buf[0].d_name,"..");
+	strcpy(dir_buf[0].d_name,".");
 	dir_buf[0].d_ino = 1;
-	strcpy(dir_buf[1].d_name,".");
+	strcpy(dir_buf[1].d_name,"..");
 	dir_buf[1].d_ino = 1;
 	strcpy(dir_buf[2].d_name,"etc");
 	dir_buf[2].d_ino = 2;

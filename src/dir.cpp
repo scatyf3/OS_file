@@ -1,18 +1,24 @@
 #include <stdio.h>
 #include <string.h>
-#include "filesys.h" 
+#include "filesys.h"
+
+#include <string.h>
+
+#define DIRSIZ 256
+#define DIEMPTY 0
+
 
 void _dir(){
 	unsigned int di_mode;
 	int i,j,k;          //xiao   
 	struct inode *temp_inode;
-
-	printf("\n CURRENT DIRECTORY :%s\n",dir.direct[0].d_name); 
 	printf("当前共有%d个文件/目录\n",dir.size);
 	for (i=0; i<DIRNUM; i++){
 		if (dir.direct[i].d_ino != DIEMPTY){
-			printf("%-14s", dir.direct[i].d_name);
+            //打印文件名
+			printf("%-14s", dir.direct[i].d_name);//这里有问题
 			temp_inode = iget(dir.direct[i].d_ino);
+            //打印文件权限
 			di_mode = temp_inode->di_mode & 00777;			 
 			for (j=0; j<9; j++){
 				if (di_mode%2){
@@ -23,6 +29,7 @@ void _dir(){
 				di_mode = di_mode/2;
 			}
 			printf("\ti_ino->%d\t",temp_inode->i_ino);
+            //如果是文件，打印信息
 			if (temp_inode->di_mode & DIFILE){
 				printf(" %ld ", temp_inode->di_size);
 				printf("block chain:");
@@ -30,7 +37,7 @@ void _dir(){
 				for (k=0; k < temp_inode->di_size/BLOCKSIZ+j; k++)
 					printf("%4d", temp_inode->di_addr[k]);
 				printf("\n");
-			}else{
+			}else{//如果不是文件，表明它是dir
 				printf("<dir>\n");
 			}//else
 			iput(temp_inode);
@@ -38,6 +45,7 @@ void _dir(){
 	}//for 
 	return;
 }
+
 void mkdir(char *dirname){
 	int dirid, dirpos;
 	struct inode *inode;
@@ -59,10 +67,10 @@ void mkdir(char *dirname){
 	dir.direct[dirpos].d_ino = inode->i_ino;	//设置该目录的磁盘i节点号
 	dir.size++;									//目录数++		
 	
-	strcpy(buf[0].d_name,"..");					//子目录的上一层目录 当前目录
+	strcpy(buf[0].d_name,".");					//当前目录
 	buf[0].d_ino = cur_path_inode->i_ino;
-	strcpy(buf[1].d_name, ".");
-	buf[1].d_ino = inode->i_ino;				//子目录的本目录 子目录
+	strcpy(buf[1].d_name, "..");
+	buf[1].d_ino = inode->i_ino;				//上一级目录
 
 	block = balloc();
 	memcpy(disk+DATASTART+block*BLOCKSIZ, buf, BLOCKSIZ);
@@ -76,7 +84,7 @@ void mkdir(char *dirname){
 
 	iput(inode);
 	return;
-}
+ }
 
 
 void chdir(char *dirname){
@@ -85,11 +93,13 @@ void chdir(char *dirname){
 	unsigned short block;
 	int i,j,low=0, high=0;
 
+    //通过目录名，获取目录索引
 	dirid = namei(dirname);
 	if (dirid == -1){
 		printf("不存在目录%s！\n", dirname);
 		return;
-	}	
+	}
+    //判断是否为文件
 	inode =iget(dir.direct[dirid].d_ino);
 	if(!(inode->di_mode&DIDIR)){
 		printf("%s不是一个目录！\n");
@@ -128,14 +138,7 @@ void chdir(char *dirname){
 	//end by xiao
 
 	return;  
-} 
-
-
-
- 
- 
-
-
+}
 
 
 

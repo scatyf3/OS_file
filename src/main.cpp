@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "filesys.h" 
 
+//global vars
 struct hinode 	hinode[NHINO];
 
 struct dir 		dir;

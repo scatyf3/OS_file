@@ -98,7 +98,7 @@ struct dinode{
     unsigned int 	di_addr[NADDR];   /*物理块号*/
 };
 
-
+//目录项
 struct direct{
     char d_name[DIRSIZ];
     unsigned int d_ino;
@@ -125,6 +125,7 @@ struct pwd{
     char 				password [PWDSIZ];
 };
 
+//目录
 struct dir{
     struct direct 		direct[DIRNUM];
     int 				size;  				/*当前目录大小*/

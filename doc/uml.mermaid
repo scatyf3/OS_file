@@ -1,0 +1,109 @@
+classDiagram
+    class inode {
+        + struct inode *i_forw
+        + struct inode *i_back
+        + char i_flag
+        + unsigned int i_ino
+        + unsigned int i_count
+        + unsigned short di_number
+        + unsigned short di_mode
+        + unsigned short di_uid
+        + unsigned short di_gid
+        + unsigned short di_size
+        + unsigned int di_addr[NADDR]
+    }
+
+    class dinode {
+        + unsigned short di_number
+        + unsigned short di_mode
+        + unsigned short di_uid
+        + unsigned short di_gid
+        + unsigned short di_size
+        + unsigned int di_addr[NADDR]
+    }
+
+    class direct {
+        + char d_name[DIRSIZ]
+        + unsigned int d_ino
+    }
+
+    class filsys {
+        + unsigned short s_isize
+        + unsigned long s_fsize
+        + unsigned int s_nfree
+        + unsigned short s_pfree
+        + unsigned int s_free[NICFREE]
+        + unsigned int s_ninode
+        + short int s_pinode
+        + unsigned int s_inode[NICINOD]
+        + unsigned int s_rinode
+        + char s_fmod
+    }
+
+    class pwd {
+        + unsigned short p_uid
+        + unsigned short p_gid
+        + char password[PWDSIZ]
+    }
+
+    class dir {
+        + struct direct direct[DIRNUM]
+        + int size
+    }
+
+    class hinode {
+        + struct inode *i_forw
+    }
+
+    class file {
+        + char f_flag
+        + unsigned int f_count
+        + struct inode *f_inode
+        + unsigned long f_off
+    }
+
+    class user {
+        + unsigned short u_default_mode
+        + unsigned short u_uid
+        + unsigned short u_gid
+        + unsigned short u_ofile[NOFILE]
+    }
+
+    class filsys {
+        - struct hinode hinode[NHINO]
+        - struct dir dir
+        - struct file sys_ofile[SYSOPENFILE]
+        - struct filsys filsys
+        - struct pwd pwd[PWDNUM]
+        - struct user user[USERNUM]
+        - struct inode *cur_path_inode
+        - int user_id
+        - char disk[(DINODEBLK+FILEBLK+2)*BLOCKSIZ]
+        --
+        - struct inode *iget(unsigned int)
+        - void iput(struct inode *)
+        - unsigned int balloc(unsigned int)
+        - unsigned int balloc()
+        - void bfree(unsigned int)
+        - struct inode* ialloc()
+        - void ifree(unsigned int)
+        - int namei(char *)
+        - unsigned short iname(char *)
+        - unsigned int access(unsigned int,struct inode *,unsigned short)
+        - void _dir()
+        - void mkdir(char *)
+        - void chdir(char *)
+        - short open(int,char*,char)
+        - int creat(unsigned int,char *,unsigned short)
+        - unsigned int read(int fd, char *buf, unsigned int size)
+        - unsigned int write(int fd,char *buf,unsigned int size)
+        - int login(unsigned short, char *)
+        - int logout(unsigned short)
+        - void install()
+        - void format()
+        - void close(unsigned int,unsigned short)
+        - void halt()
+        - void delete(char *)
+        - int shell(int user_id,char *str)
+    }
+
