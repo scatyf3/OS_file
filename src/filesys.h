@@ -104,7 +104,7 @@ struct direct{
     unsigned int d_ino;
 };
 
-struct filsys{
+struct filsys{//超级块
     unsigned short  	s_isize;   			/*i节点块块数*/
     unsigned long   	s_fsize;   			/*数据块块数*/
     unsigned int   		s_nfree;    		/*空闲块*/

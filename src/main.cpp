@@ -2,10 +2,10 @@
 #include "filesys.h" 
 
 //global vars
-struct hinode 	hinode[NHINO];
+struct hinode 	hinode[NHINO];//HASG表，增加文件访问速度？
 
 struct dir 		dir;
-struct file 	sys_ofile[SYSOPENFILE];
+struct file 	sys_ofile[SYSOPENFILE];//打开的文件列表->写入内存增加访问速度
 struct filsys 	filsys;
 struct pwd 		pwd[PWDNUM];
 struct user 	user[USERNUM];

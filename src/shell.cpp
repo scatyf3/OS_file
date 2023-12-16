@@ -119,6 +119,7 @@ int shell(int user_id,char *str){
             close(user_id,fd);
             break;
         case 0:
+            halt();
             return 0;
         default:
             printf("����:û������%s��\n",token);

@@ -25,6 +25,11 @@ add_executable(filsys
     ../src/shell.cpp
 )
 
+# 添加 clean 规则
+add_custom_target(clean-all
+        COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/filsys
+        COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/../data/data.bin
+)
 
 # 设置编译选项
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")  # 添加 -g 选项以生成调试信息
