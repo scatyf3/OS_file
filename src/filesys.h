@@ -104,18 +104,51 @@ struct direct{
     unsigned int d_ino;
 };
 
+/*
+ * 关于超级块
++---------------------+
+|     Superblock      |
++---------------------+
+| s_isize             |  (2 bytes)     i节点块块数
++---------------------+
+| s_fsize             |  (4 bytes)     数据块块数
++---------------------+
+| s_nfree             |  (4 bytes)     空闲块数
++---------------------+
+| s_pfree             |  (2 bytes)     空闲块指针
++---------------------+
+| s_free[0]           |  (4 bytes)     空闲块堆栈的第一个块号
++---------------------+
+| s_free[1]           |  (4 bytes)     空闲块堆栈的第二个块号
++---------------------+
+|        ...          |  ...           其他空闲块堆栈的块号
++---------------------+
+| s_ninode            |  (4 bytes)     s_inode中的空闲inode数
++---------------------+
+| s_pinode            |  (2 bytes)     s_inode的指针
++---------------------+
+| s_inode[0]          |  (4 bytes)     空闲inode数组的第一个inode号
++---------------------+
+| s_inode[1]          |  (4 bytes)     空闲inode数组的第二个inode号
++---------------------+
+|        ...          |  ...           其他空闲inode数组的inode号
++---------------------+
+| s_rinode            |  (4 bytes)     记录的inode号
++---------------------+
+| s_fmod              |  (1 byte)      超级块修改标志
++---------------------+
+ */
+
 struct filsys{//超级块
     unsigned short  	s_isize;   			/*i节点块块数*/
     unsigned long   	s_fsize;   			/*数据块块数*/
     unsigned int   		s_nfree;    		/*空闲块*/
     unsigned short  	s_pfree;  			/*空闲块指针*/
     unsigned int  		s_free[NICFREE];  	/*空闲块堆栈*/
-
     unsigned int  		s_ninode;  			/*number of free inode in s_inode*/
     short int 			s_pinode;  			/*pointer of the sinode*/
     unsigned int  		s_inode[NICINOD];   /*空闲i节点数组*/
     unsigned int 		s_rinode;    		/*remember inode*/
-
     char 				s_fmod;  			/*超级块修改标志*/
 };
 

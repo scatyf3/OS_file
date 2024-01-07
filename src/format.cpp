@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include "filesys.h" 
+#include "filesys.h"
 
 void format(){
 	struct inode *inode;
@@ -10,15 +10,10 @@ void format(){
 	int i,j;
 
 	//初始化硬盘
-    FILE* file = fopen("../data/data.bin", "rb"); // 以二进制读取模式打开文件
-    if(file==NULL){
+    FILE* disk = fopen("../data/data.bin", "rb"); // 以二进制读取模式打开文件
+    if(disk==NULL){
         memset(disk, 0x00, ((DINODEBLK+FILEBLK+2)*BLOCKSIZ));
     }
-    else{
-        size_t count = fread(disk, sizeof(char), (DINODEBLK + FILEBLK + 2) * BLOCKSIZ, file);
-        printf("我们从磁盘里读取了%lu数据\n",count);
-    }
-
 
 	/* 0.initialize the passwd */
     /*pwd 不存外存了，直接硬编码在代码里吧*/
@@ -63,13 +58,20 @@ void format(){
 	strcpy(dir_buf[2].d_name,"etc");
 	dir_buf[2].d_ino = 2;
 
-    //从disk中读取
+    //disk存取之1：放入DATASTART部分，即第一个dinode块
     if(memcmp(disk + DATASTART, "\x00", 1) == 0){
         //若disk为空，从format里初始化的变量，拷贝到disk里
         memcpy(disk+DATASTART, &dir_buf, 3*(DIRSIZ+4));
     }else{
-        //若disk不为空，从disk拷贝上一次储存好的值
-        memcpy(&dir_buf, disk+DATASTART, 3*(DIRSIZ+4));
+        // 若disk不为空，从disk拷贝上一次储存好的值
+        // memcpy(&dir_buf, disk+DATASTART, 3*(DIRSIZ+4));
+        // ssize_t pread(int fd, void buf[.count], size_t count,
+        //                     off_t offset);
+        if(fseek(disk,DATASTART,SEEK_DATA)!=0){
+            perror("设定磁盘读取offset错误");
+        }
+        fread(dir_buf,3*(DIRSIZ+4),1,disk);
+        rewind(disk);
     }
 	iput(inode);
 
@@ -87,8 +89,19 @@ void format(){
 	strcpy(dir_buf[2].d_name,"password");
 	dir_buf[2].d_ino = 3;
 
-	memcpy(disk+DATASTART+BLOCKSIZ*1, dir_buf, 3*(DIRSIZ+4));
-	iput(inode);
+    //disk存取之2：放入第二个dinode块
+	if(memcmp(disk+DATASTART+BLOCKSIZ*1,"\x00", 1)==0){
+        memcpy(disk+DATASTART+BLOCKSIZ*1, dir_buf, 3*(DIRSIZ+4));
+    }else{
+        //memcpy(dir_buf,disk+DATASTART+BLOCKSIZ*1,3*(DIRSIZ+4));
+        if(fseek(disk,DATASTART+BLOCKSIZ*1,SEEK_DATA)!=0){
+            perror("设定磁盘读取offset错误");
+        }
+        fread(dir_buf,3*(DIRSIZ+4),1,disk);
+        rewind(disk);
+    }
+
+    iput(inode);
 
 	inode = iget(3);  /* 3  password id */
 	inode->di_number = 1;
@@ -96,6 +109,7 @@ void format(){
 	inode->di_size = BLOCKSIZ;
 	inode->di_addr[0] = 2; /*block 2# is used by the password file*/
 
+    //TODO: put password here
 	for (i=5; i<PWDNUM; i++){
 		passwd[i].p_uid = 0;
 		passwd[i].p_gid = 0;
@@ -103,22 +117,33 @@ void format(){
 	}
     memcpy(pwd, passwd, 32*sizeof(struct pwd));
 
+    //disk存取之3:密码，放入第三个dinode块
     if(memcmp(disk + DATASTART+BLOCKSIZ*2, "\x00", 1) == 0){
         memcpy(disk+DATASTART+BLOCKSIZ*2, passwd, BLOCKSIZ);
     }
     else{
-        memcpy(passwd, disk+DATASTART+BLOCKSIZ*2, BLOCKSIZ);
+        //memcpy(passwd, disk+DATASTART+BLOCKSIZ*2, BLOCKSIZ);
+        if(fseek(disk,DATASTART+BLOCKSIZ*2,SEEK_DATA)!=0){
+            perror("设定磁盘读取offset错误");
+        }
+        fread(dir_buf,BLOCKSIZ,1,disk);
+        rewind(disk);
     }
 	iput(inode);
 
 	/*2. initialize the superblock */
     //初始化若干写好的文件系统参数
+    //unsigned int block_buf[BLOCKSIZ/sizeof(int)];
     if(memcmp(disk+BLOCKSIZ, "\x00", 1) == 0){
         //若没有超级块
-        printf("===init filsys superblock===\n");
-        filsys.s_isize = DINODEBLK;
-        filsys.s_fsize = FILEBLK;
+        printf("===init filsys superblock from void===\n");
+        filsys.s_isize = DINODEBLK; //dinode的数目
+        filsys.s_fsize = FILEBLK; //文件块的数目
         filsys.s_ninode = DINODEBLK * BLOCKSIZ/DINODESIZ - 4;
+        //表示文件系统中可用的 inode 的个数。
+        // 根据给定的 DINODEBLK（inode 区域的块数）、BLOCKSIZ（块大小）和 DINODESIZ（inode 的大小），
+        // 减去 4 个已经被使用的 inode（由 main、etc、password 等占用）。
+
         filsys.s_nfree = FILEBLK - 3;
         for (i=0; i < NICINOD; i++){
             /* begin with 4,    0,1,2,3, is used by main,etc,password */
@@ -126,10 +151,10 @@ void format(){
         }
         filsys.s_pinode = 0;
         filsys.s_rinode = NICINOD + 4;
+        //block_buf 数组只是这段代码中的一种临时数据结构，用于初始化文件系统的空闲块列表 @chatGPT
         block_buf[NICFREE-1] = FILEBLK+1;  /*FILEBLK+1 is a flag of end*/
         for (i=0; i<NICFREE-1; i++)
             block_buf[NICFREE-2-i] = FILEBLK-i-1;			//从最后一个数据块开始分配??????
-
         memcpy(disk+DATASTART+BLOCKSIZ*(FILEBLK-NICFREE), block_buf, BLOCKSIZ);
 
         for (i=FILEBLK-2*NICFREE+1; i>2; i-=NICFREE){
@@ -150,7 +175,15 @@ void format(){
         memcpy(disk+BLOCKSIZ, &filsys, sizeof(struct filsys));
     }else{
         printf("===loading filsys superblock from disk===\n");
-        memcpy(&filsys,disk+BLOCKSIZ , sizeof(struct filsys));
+
+        memcpy(disk+DATASTART+BLOCKSIZ*(FILEBLK-NICFREE), block_buf, BLOCKSIZ);
+
+        //memcpy(&filsys,disk+BLOCKSIZ , sizeof(struct filsys));
+        if(fseek(disk,BLOCKSIZ,SEEK_DATA)!=0){
+            perror("设定磁盘读取offset错误");
+        }
+        fread(&filsys,sizeof(struct filsys),1,disk);
+        rewind(disk);
     }
 
 	return;

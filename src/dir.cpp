@@ -59,6 +59,7 @@ void mkdir(char *dirname){
 		iput(inode);
 		return;
 	}
+
 	dirpos = iname(dirname);					//取得在addr中的空闲项位置,并将目录名写到此项里
 	inode = ialloc();							//分配i节点
 	dir.direct[dirpos].d_ino = inode->i_ino;	//设置该目录的磁盘i节点号
