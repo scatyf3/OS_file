@@ -189,6 +189,7 @@ extern void          delete(char *);
 extern int 			 shell(int user_id,char *str);
 extern void          chpwd(char* new_pwd);
 extern void          userinfo();
+extern int           chname(char *filename, char *newname);
 
 #endif
 

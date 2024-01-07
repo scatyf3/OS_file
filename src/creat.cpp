@@ -50,6 +50,26 @@ int creat(unsigned int user_id, char *filename, unsigned short mode){
     return 0;
 }
 
+int chname(char *filename, char *newname) {
+    struct inode *inode;
+    int dirid;
+    dirid = namei(filename);
+    if(dirid==-1){
+        printf("该文件不存在");
+        return -1;
+    }
+    inode = iget(dir.direct[dirid].d_ino);
+    if (access(user_id,inode,WRITE) == 0){
+        iput(inode);
+        printf("\n creat access not allowed \n");
+        return -1;
+    }
+    strcpy(dir.direct[dirid].d_name,newname);
+    printf("成功将源文件%s更改为%s\n",filename,newname);
+    return 0;
+
+}
+
 
 
 
