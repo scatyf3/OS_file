@@ -1,7 +1,6 @@
 #ifndef _FILESYS_H
 #define _FILESYS_H
 
-#define delete 		dele     		//delete 在c++里是保留字  by tangfl
 //#define exit(a)		return			//建议使用 return         by tangfl
 
 //All Defines
@@ -185,11 +184,12 @@ extern void          install();
 extern void          format();
 extern void          close(unsigned int,unsigned short);
 extern void          halt();
-extern void          delete(char *);
+extern void          dele(char *);
 extern int 			 shell(int user_id,char *str);
 extern void          chpwd(char* new_pwd);
 extern void          userinfo();
 extern int           chname(char *filename, char *newname);
+extern int           copy_file(char* srcfile,char* dstfile);
 
 #endif
 

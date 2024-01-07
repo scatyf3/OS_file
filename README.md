@@ -35,7 +35,11 @@
 - 在命令提示符前加入路径；增加pwd命令用来显示当前路径；
 - 文件名更名；✅
 - 复制文件；
-- 其他功能。
+- 其他功能: 美化的命令行输出
+
+## 鸣谢
+
+在本项目中，我们使用了c++ 的 [variadic_table](https://github.com/friedmud/variadic_table)这一header only的三方库
 
 # 项目结构
 

@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include "filesys.h"
+#include <string>
+#include "VariadicTable.h"
 
-#include <string.h>
 
 void _dir(){
 	unsigned int di_mode;
@@ -10,37 +11,40 @@ void _dir(){
 	struct inode *temp_inode;
     printf("当前共有%d个文件/目录\n",dir.size);
     printf("\n CURRENT DIRECTORY :%s\n",dir.direct[0].d_name);
-	for (i=0; i<DIRNUM; i++){
-		if (dir.direct[i].d_ino != DIEMPTY){
-            //打印文件名
-			printf("%-14s", dir.direct[i].d_name);//这里有问题
-			temp_inode = iget(dir.direct[i].d_ino);
-            //打印文件权限
-			di_mode = temp_inode->di_mode & 00777;			 
-			for (j=0; j<9; j++){
-				if (di_mode%2){
-					printf("x");
-				}else{
-					printf("-");
-				}
-				di_mode = di_mode/2;
-			}
-			printf("\ti_ino->%d\t",temp_inode->i_ino);
-            //如果是文件，打印信息
-			if (temp_inode->di_mode & DIFILE){
-				printf(" %ld ", temp_inode->di_size);
-				printf("block chain:");
-				j=(temp_inode->di_size%BLOCKSIZ)?1:0;
-				for (k=0; k < temp_inode->di_size/BLOCKSIZ+j; k++)
-					printf("%4d", temp_inode->di_addr[k]);
-				printf("\n");
-			}else{//如果不是文件，表明它是dir
-				printf("<dir>\n");
-			}//else
-			iput(temp_inode);
-		}// if (dir.direct[i].d_ino != DIEMPTY) 
-	}//for 
-	return;
+    VariadicTable<std::string, std::string, std::string, std::string> vt({"Name", "Access", "inode", "Category"}, 1000);
+
+    for (int i = 0; i < DIRNUM; i++) {
+        if (dir.direct[i].d_ino != DIEMPTY) {
+            std::string name = dir.direct[i].d_name;
+            std::string access = ""; // 存储文件权限字符串
+            std::string inode = ""; // 存储 inode 号
+            std::string category = ""; // 存储文件类别
+
+            // 计算文件权限字符串
+            int di_mode = iget(dir.direct[i].d_ino)->di_mode & 00777;
+            for (int j = 0; j < 9; j++) {
+                if (di_mode % 2) {
+                    access = "x" + access;
+                } else {
+                    access = "-" + access;
+                }
+                di_mode = di_mode / 2;
+            }
+
+            // 设置 inode 号
+            inode = "i_ino->" + std::to_string(iget(dir.direct[i].d_ino)->i_ino);
+
+            // 根据文件类型设置类别
+            if (iget(dir.direct[i].d_ino)->di_mode & DIFILE) {
+                category = "<file>";
+            } else {
+                category = "<dir>";
+            }
+
+            vt.addRow(name, access, inode, category);
+        }
+    }
+    vt.print(std::cout);
 }
 
 void mkdir(char *dirname){

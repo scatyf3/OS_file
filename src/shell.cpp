@@ -14,7 +14,8 @@ char commands[CNUM][CLEN]={
         "password",
         "who",
         "adduser",
-        "chname"
+        "chname",
+        "copy"
 };
 int getcid(char *command){
     int i;
@@ -82,7 +83,7 @@ int shell(int user_id,char *str){
                 printf("del 命令的正确格式为del filename，请检查命令!\n");
                 break;
             }
-            delete(token);
+            dele(token);
             break;
         case 6:
             mode = WRITE;
@@ -129,9 +130,7 @@ int shell(int user_id,char *str){
         case 9:
             userinfo();
             break;
-        case 0:
-            halt();
-            return 0;
+
         case 11:
             token = strtok(NULL, seps);
             if (token == NULL) {
@@ -146,6 +145,23 @@ int shell(int user_id,char *str){
             }
             chname(tstr, token);
             break;
+        case 12:
+            token = strtok(NULL, seps);
+            if (token == NULL) {
+                printf("copy命令的正确格式为copy srcfile dstname，请检查命令!\n");
+                break;
+            }
+            tstr = token;
+            token = strtok(NULL, seps);
+            if (token == NULL) {
+                printf("copy命令的正确格式为copy srcfile dstname，请检查命令!\n");
+                break;
+            }
+            copy_file(tstr, token);
+            break;
+        case 0:
+            halt();
+            return 0;
         default:
             printf("����:û������%s��\n",token);
             break;
